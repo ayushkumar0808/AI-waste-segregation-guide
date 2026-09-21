@@ -1,0 +1,6 @@
+{
+  "name": "EcoSort - AI Waste Segregation Guide",
+  "description": "AI waste segregation guide helping users correctly classify household waste with retrieval from Solid Waste Management Rules 2016.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
