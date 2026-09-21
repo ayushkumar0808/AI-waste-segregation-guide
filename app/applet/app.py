@@ -103,7 +103,6 @@ tab_app, tab_rules, tab_docs = st.tabs([
 # TAB 1: INTERACTIVE CLASSIFIER
 # ==========================================
 with tab_app:
-    # Quick Test Presets
     st.markdown("**Quick test suggestions (Click to classify instantly):**")
     cols = st.columns(5)
     preset_items = [
@@ -114,7 +113,6 @@ with tab_app:
         "Expired paracetamol syrup"
     ]
 
-    # Handle session state for preset clicks
     if "waste_item" not in st.session_state:
         st.session_state["waste_item"] = "Used pizza box"
 
@@ -122,7 +120,6 @@ with tab_app:
         if cols[i].button(item, key=f"preset_{i}", use_container_width=True):
             st.session_state["waste_item"] = item
 
-    # Input Area
     waste_input = st.text_input(
         label="Enter any waste item to classify:",
         value=st.session_state.get("waste_item", "Used pizza box"),
@@ -130,18 +127,15 @@ with tab_app:
         key="waste_input_field"
     )
 
-    # Optional image upload hook (Marked as a clear multimodal TODO)
     with st.expander("📸 Optional: Upload Image of Waste (Multimodal Feature)"):
         st.info("💡 **TODO for Next Version:** Multimodal image classification using IBM Granite Vision models.")
         uploaded_file = st.file_uploader("Upload an item picture (JPG, PNG)", type=["jpg", "jpeg", "png"], disabled=True)
         st.caption("Current prototype focuses on instant natural-language text queries.")
 
-    # Process Classification
     current_query = waste_input.strip() if waste_input.strip() else st.session_state.get("waste_item", "Used pizza box")
 
     if current_query:
         with st.spinner("Retrieving SWM Rules 2016 context and classifying..."):
-            # 1. RAG Retrieval via TF-IDF
             if rag_engine:
                 retrieved_chunks = rag_engine.retrieve(current_query, top_k=1)
                 top_chunk = retrieved_chunks[0]
@@ -151,7 +145,6 @@ with tab_app:
                 retrieved_context = "SWM Rules 2016 General Guidelines."
                 source_title = "SWM Rules 2016 Reference"
 
-            # 2. LLM / Fallback Classification
             result = classify_waste(current_query, retrieved_context)
 
         category = result.get("category", "General Waste")
@@ -163,7 +156,6 @@ with tab_app:
 
         st.divider()
 
-        # --- Display Result Cards ---
         st.subheader(f"Results for: *\"{current_query}\"*")
         st.caption(f"🤖 Engine Mode: **{mode}**")
 
@@ -188,7 +180,6 @@ with tab_app:
             st.markdown("**💡 Eco Tip (Reduce / Reuse / Upcycle):**")
             st.write(tip)
 
-        # Critical Safety Disclaimer for Hazardous / Biomedical Waste
         if is_hazardous or "hazardous" in category.lower() or "e-waste" in category.lower() or "sanitary" in category.lower():
             st.warning("""
             ⚠️ **Safety & Health Advisory:**  
@@ -197,7 +188,6 @@ with tab_app:
             authorized campus e-waste drives or your local municipal collection centers.
             """)
 
-        # RAG Source Attribution
         st.markdown("---")
         st.markdown("#### 📚 Source Used (RAG Grounding):")
         with st.expander(f"Verified Reference: {source_title}", expanded=True):
@@ -225,13 +215,13 @@ with tab_rules:
             - **Handling:** Collected daily. Suitable for household/community composting or biomethanation plants.
             """)
 
-        with rule_col2:
-            with st.expander("🔵 2. Dry Waste (Recyclable Non-Biodegradable)", expanded=True):
-                st.markdown("""
-                - **Bin Color:** Blue
-                - **Examples:** Clean paper, cardboard cartons, plastics (milk pouches, bottles, food wrappers rinsed clean), glass bottles, metal cans.
-                - **Handling:** Sent to Material Recovery Facilities (MRFs) and registered recyclers. Soiled paper/pizza boxes with heavy oil residue cannot be recycled.
-                """)
+    with rule_col2:
+        with st.expander("🔵 2. Dry Waste (Recyclable Non-Biodegradable)", expanded=True):
+            st.markdown("""
+            - **Bin Color:** Blue
+            - **Examples:** Clean paper, cardboard cartons, plastics (milk pouches, bottles, food wrappers rinsed clean), glass bottles, metal cans.
+            - **Handling:** Sent to Material Recovery Facilities (MRFs) and registered recyclers. Soiled paper/pizza boxes with heavy oil residue cannot be recycled.
+            """)
 
     rule_col3, rule_col4 = st.columns(2)
 
